@@ -17,13 +17,19 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/forground.png",
+        "foregroundImage": "./assets/calculator.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.vickyvicky.Calculator"
     },
     "web": {
       "favicon": "./assets/calculator.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e5306045-1fb3-4824-a237-3b9818d3177d"
+      }
     }
   }
 }
