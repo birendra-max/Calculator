@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Linking, Alert } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Linking, Alert, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Contact() {
@@ -10,39 +10,50 @@ export default function Contact() {
     message: ""
   });
 
+  const [loder, isLoding] = useState(false);
+
   const handleChange = (key, val) => {
     setForm({ ...form, [key]: val });
   };
 
   const handleSubmit = async () => {
-    const fromBody = new URLSearchParams();
-    fromBody.append("name", form.name);
-    fromBody.append("email", form.email);
-    fromBody.append("subject", form.subject);
-    fromBody.append("message", form.message);
+    if (form.name != '' && form.email != '' && form.subject != '' && form.message != '') {
+      isLoding(true);
+      const fromBody = new URLSearchParams();
+      fromBody.append("name", form.name);
+      fromBody.append("email", form.email);
+      fromBody.append("subject", form.subject);
+      fromBody.append("message", form.message);
 
-    try {
-      const response = await fetch('https://birendrapradhan.in/submit_dat', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: fromBody.toString()
-      });
+      try {
+        const response = await fetch('https://birendrapradhan.in/submit_dat', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: fromBody.toString()
+        });
 
-      const data = await response.text();
-      if (data == 'Thank you for contacting me! Your message has been sent successfully') {
-        Alert.alert("Success", "We’ve received your message. Thanks for contacting us!");
-        setForm({ name: "", email: "", subject: "", message: "" });
+        const data = await response.text();
+        if (data == 'Thank you for contacting me! Your message has been sent successfully') {
+          isLoding(false);
+          Alert.alert("Success", "We’ve received your message. Thanks for contacting us!");
+          setForm({ name: "", email: "", subject: "", message: "" });
+        }
+        else {
+          isLoding(false);
+          Alert.alert("Error", data.message || "Something went wrong");
+        }
+
+      } catch (err) {
+        isLoding(false);
+        Alert.alert("Error", "Failed to connect to server.");
       }
-      else {
-        Alert.alert("Error", data.message || "Something went wrong");
-      }
-
-    } catch (err) {
-      Alert.alert("Error", "Failed to connect to server.");
     }
-
+    else {
+      isLoding(false);
+      alert('Plz enter all the details');
+    }
 
   };
 
@@ -98,11 +109,15 @@ export default function Contact() {
             onChangeText={(val) => handleChange("message", val)}
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <LinearGradient colors={['#3b82f6', '#60a5fa']} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Send Message</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          {
+            loder ? <ActivityIndicator visible={true} size="large" color='#07f3ffff' /> : <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+              <LinearGradient colors={['#3b82f6', '#60a5fa']} style={styles.buttonGradient}>
+                <Text style={styles.buttonText}>Send Message</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          }
+
+
         </LinearGradient>
 
         {/* Contact Info Card */}
